@@ -1,0 +1,44 @@
+
+body{
+
+}
+
+div#board{
+	width: 500px;
+	height: 500px;
+	border: 1px solid black;
+	display: block;
+	position: relative;
+	margin-left: auto;
+	margin-right: auto;
+	
+}
+
+div.tile{
+	width: 23%;
+	height: 23%;
+	margin: 1%;
+	position: absolute;
+	background-color: green;
+	color: white;
+	text-align: center;
+	font-size: 6vw;
+}
+
+div.tile span{
+	display: inline-block;
+	padding-top: 25%;
+	width: 100%;
+	height: 100%;
+}
+
+
+div.tile-slot{
+	width: 23%;
+	height: 23%;
+	margin: 1%;
+	display: inline-block;
+	float: left;
+	background-color: grey;
+	z-index: -100;
+}
