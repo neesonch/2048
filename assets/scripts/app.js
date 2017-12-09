@@ -6,11 +6,12 @@
 	var tileObjects = [];
 	var nextTileId = 0;
 	
+	// CN Creates new instance of a tile with the specified location and value
 	function Tile(value, col, row){
 		this.value = value;
 		this.col = col;
 		this.row = row;
-		
+		// CN Sets unique id of this tile
 		this.id = ('t_' + nextTileId);
 		nextTileId += 1;
 		
@@ -20,6 +21,7 @@
 		this.placeTile = function(){
 			var tileDiv = $("#" + this.id)[0];
 			// console.log('Current tile: ' + tileDiv);
+			// CN position of tile controlled with CSS attributes 
 			tileDiv.style.top = ((this.row * 25) + '%');
 			tileDiv.style.left = ((this.col * 25) + '%');
 			tileDiv.innerHTML = ("<span>" + this.value + "</span>");
@@ -45,7 +47,7 @@
 					break;
 				}
 			}
-			//delete div 
+			// CN delete div 
 			var tileDiv = $("#" + this.id)[0];
 			$(tileDiv).remove();
 		}
@@ -81,7 +83,7 @@
 	};
 	
 	function calculateDestination(event){
-		// Tiles moving up/down: run through each column, sort tiles in column in order of row, then assign new row in correct order
+		// CN Tiles moving up/down: run through each column, sort tiles in column in order of row, then assign new row in correct order
 		if(event.key == 'ArrowUp' || event.key == 'ArrowDown'){
 			for(var x=0; x<4; x++){
 				var tilesInCol = [];
@@ -94,10 +96,8 @@
 				tilesInCol.sort(function(a,b){
 					return a.row - b.row;
 				})
+				// CN After sorting tiles, check for matches and execute any needed combinations before assigning new row
 				tilesInCol = checkMatches(tilesInCol);
-				// if(tilesInCol.length > 0){
-					// console.log(tilesInCol[0][0].getRow());
-				// }
 				if(event.key == 'ArrowUp'){
 					for(var i =0; i<tilesInCol.length; i++){
 						tilesInCol[i].setRow(i);
@@ -114,7 +114,7 @@
 				}
 			}
 		}
-		// Tiles moving left/right: run through each row, sort tiles in row in order of column, then assign new column in correct order
+		// CN Tiles moving left/right: run through each row, sort tiles in row in order of column, then assign new column in correct order
 		if(event.key == 'ArrowLeft' || event.key == 'ArrowRight'){
 			for(var x=0; x<4; x++){
 				var tilesInRow = [];
@@ -126,6 +126,8 @@
 				tilesInRow.sort(function(a,b){
 					return a.col - b.col;
 				})
+				// CN After sorting tiles, check for matches and execute any needed combinations before assigning new row
+				tilesInRow = checkMatches(tilesInRow);
 				if(event.key == 'ArrowLeft'){
 					for(var i =0; i<tilesInRow.length; i++){
 						tilesInRow[i].setCol(i);
@@ -158,7 +160,7 @@
 		generateNewTile();
 	}
 	
-	// Iterate through given list of tiles and check for value matches. Combines each matched pair into a new tile and returns updated list of tiles
+	// CN Iterate through given list of tiles and check for value matches. Combines each matched pair into a new tile and returns updated list of tiles
 	function checkMatches(tileList){
 		if(tileList.length > 1){
 			var updatedList = [];
@@ -168,7 +170,7 @@
 					var newTile = combineTiles(tileList[i], tileList[i+1]);
 					updatedList.push(newTile);
 				} else if(i==tileList.length-2){
-					// Last iteration, add both tiles
+					// CN Last iteration, add both tiles
 					updatedList.push(tileList[i])
 					updatedList.push(tileList[i+1]);
 				} else{
@@ -177,20 +179,20 @@
 			}
 			return updatedList;
 		} else {
-			// Only one tile in list, return original tile
+			// CN Only one tile in list, return original tile
 			return tileList;
 		}
 		// console.log(updatedList);	
 	}
 	
-	//  Generate new tile in random valid location 
+	// CN  Generate new tile in random valid location 
 	function generateNewTile(){
 		checkOpenLocations();
 	}
 	
-	//Check for open positions on the board
+	// CN Check for open positions on the board
 	function checkOpenLocations(){
-		// Create array of every possible location
+		// CN Create array of every possible location
 		var locArray = [];
 		for(var c = 0; c<4;c++){
 			for(var r = 0; r<4;r++){
@@ -198,7 +200,7 @@
 				locArray.push(coords);
 			}
 		}
-		// Compare tile locations to possible locations and remove matches, leaving only open locations
+		// CN Compare tile locations to possible locations and remove matches, leaving only open locations
 		var tileString
 		var boardString
 		for(var i = 0; i<tileObjects.length; i++){
@@ -210,7 +212,7 @@
 		}
 	}
 	
-	// Combine two given tiles into new tile, return reference to new tile
+	// CN Combine two given tiles into new tile, return reference to new tile
 	function combineTiles(tileA, tileB){
 		var newTile = new Tile((tileA.value*2), tileA.col, tileA.row);
 		tileA.removeTile();
