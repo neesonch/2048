@@ -1,5 +1,13 @@
+/* TODO: 
+Add score counter, 
+add game over logic, 
+fix bug with new tile location, 
+add logic so that new tile is rendered after move animation, 
+randomise value of new tile,
+check if move is valid (i.e. if any movement took place),
+algorithm for colouring tiles
+*/
 (function(){
-	//console.log('hello');		//DEBUG
 	
 	var tileDivs = [];
 	var board = $("#board")[0];
@@ -20,7 +28,6 @@
 		
 		this.placeTile = function(){
 			var tileDiv = $("#" + this.id)[0];
-			// console.log('Current tile: ' + tileDiv);
 			// CN position of tile controlled with CSS attributes 
 			tileDiv.style.top = ((this.row * 25) + '%');
 			tileDiv.style.left = ((this.col * 25) + '%');
@@ -72,14 +79,12 @@
 			return this.col;
 		}
 		
-		//console.log(this.getCoordinates());
 		this.placeTile();
 	}
 	
 	
 	function getTiles(){
 		tileDivs = $('.tile');
-		//console.log(tileDivs);		//DEBUG
 	};
 	
 	function calculateDestination(event){
@@ -87,7 +92,6 @@
 		if(event.key == 'ArrowUp' || event.key == 'ArrowDown'){
 			for(var x=0; x<4; x++){
 				var tilesInCol = [];
-				//console.log(tileObjects); //DEBUG
 				for(var i =0; i<tileObjects.length; i++){
 					if(tileObjects[i].col == x){
 						tilesInCol.push(tileObjects[i]);
@@ -147,7 +151,6 @@
 	}
 	
 	function moveTiles(event){
-		//console.log(event.key);
 		calculateDestination(event);
 		for(var i =0; i<tileObjects.length; i++){
 			if(event.key == 'ArrowUp' || event.key == 'ArrowDown'){
@@ -165,7 +168,6 @@
 		if(tileList.length > 1){
 			var updatedList = [];
 			for (var i=0; i < (tileList.length-1); i++){
-				//console.log(tileList[i].value == tileList[i+1].value);		//DEBUG
 				if(tileList[i].value == tileList[i+1].value){
 					var newTile = combineTiles(tileList[i], tileList[i+1]);
 					updatedList.push(newTile);
@@ -182,34 +184,38 @@
 			// CN Only one tile in list, return original tile
 			return tileList;
 		}
-		// console.log(updatedList);	
 	}
 	
 	// CN  Generate new tile in random valid location 
 	function generateNewTile(){
-		checkOpenLocations();
+		var openLocations = checkOpenLocations();
+		if(openLocations.length > 0){
+			// CN get random location string and format into valid coordinates
+			var randomIndex = Math.floor(Math.random() * openLocations.length);
+			var newCol = parseInt(openLocations[randomIndex].split('(')[1]);
+			var newRow = parseInt(openLocations[randomIndex].split(',')[1]);
+			new Tile(2, newCol, newRow);
+		}
 	}
 	
 	// CN Check for open positions on the board
 	function checkOpenLocations(){
 		// CN Create array of every possible location
-		var locArray = [];
+		var allLocations = [];
 		for(var c = 0; c<4;c++){
 			for(var r = 0; r<4;r++){
-				var coords = [c, r];
-				locArray.push(coords);
+				var coords = '(' + c + ',' + r + ')';
+				allLocations.push(coords);
 			}
 		}
-		// CN Compare tile locations to possible locations and remove matches, leaving only open locations
-		var tileString
-		var boardString
+		// CN Iterate through tile objects and remove their location from list, leaving only open locations
+		var thisTileCoordinates;
 		for(var i = 0; i<tileObjects.length; i++){
-			for (var j = 0; j<locArray.length; j++){
-				tileString = JSON.stringify(tileObjects[i].getCoordinates());
-				boardString = JSON.stringify(locArray[j]);
-				console.log(tileString == boardString); //TODO
-			}
+			thisTileCoordinates = '(' + tileObjects[i].getCol() + ',' + tileObjects[i].getRow() + ')';
+			var thisTileIndex = allLocations.indexOf(thisTileCoordinates);
+			allLocations.splice(thisTileIndex, 1) ;
 		}
+		return allLocations;
 	}
 	
 	// CN Combine two given tiles into new tile, return reference to new tile
@@ -219,6 +225,8 @@
 		tileB.removeTile();
 		return newTile;
 	}
+	
+	
 	
 	
 	new Tile(2, 1, 1);
