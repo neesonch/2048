@@ -1,18 +1,23 @@
 /* TODO: 
-Add score counter, 
+Style score counter, 
+Add top score logic (local storage)
 add game over logic, 
 fix bug with new tile location, 
 add logic so that new tile is rendered after move animation, 
-randomise value of new tile,
 check if move is valid (i.e. if any movement took place),
 algorithm for colouring tiles
 */
 (function(){
+	//alert(typeof(Storage));	//DEBUG 
 	
 	var tileDivs = [];
 	var board = $("#board")[0];
+	var gameScoreDisplay = $('#game-score')[0];
+	var highScoreDisplay = $('#high-score')[0];
 	var tileObjects = [];
 	var nextTileId = 0;
+	var score = 0;
+	var isHighScore = true;
 	
 	// CN Creates new instance of a tile with the specified location and value
 	function Tile(value, col, row){
@@ -194,7 +199,8 @@ algorithm for colouring tiles
 			var randomIndex = Math.floor(Math.random() * openLocations.length);
 			var newCol = parseInt(openLocations[randomIndex].split('(')[1]);
 			var newRow = parseInt(openLocations[randomIndex].split(',')[1]);
-			new Tile(2, newCol, newRow);
+			var newTileValue = Math.random() > 0.33 ? 2 : 4;
+			new Tile(newTileValue, newCol, newRow);
 		}
 	}
 	
@@ -220,15 +226,24 @@ algorithm for colouring tiles
 	
 	// CN Combine two given tiles into new tile, return reference to new tile
 	function combineTiles(tileA, tileB){
-		var newTile = new Tile((tileA.value*2), tileA.col, tileA.row);
+		var newTile = new Tile((tileA.value*2), tileA.col, tileA.row)
+		updateScore(newTile.value);
 		tileA.removeTile();
 		tileB.removeTile();
 		return newTile;
 	}
 	
-	
-	
-	
+	// CN Update scores (this game and high score) - called from within combineTiles()
+	function updateScore(increment){
+		score += increment;
+		gameScoreDisplay.innerHTML = score;
+		console.log(score);
+		if (isHighScore){
+			highScoreDisplay.innerHTML = score;
+		}
+	}
+
+		
 	new Tile(2, 1, 1);
 	new Tile(2, 0, 0);
 	new Tile(4, 1, 0);
